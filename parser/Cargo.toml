@@ -1,0 +1,10 @@
+[package]
+name = "parser"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+winnow = "0.7.2"
+
+[dev-dependencies]
+rstest = "0.24.0"
