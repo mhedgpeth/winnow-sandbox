@@ -10,6 +10,7 @@ use winnow::{
 pub struct Property {
     key: String,
     pub value: String,
+    span: std::ops::Range<usize>,
 }
 
 fn parse_identifier(input: &mut LocatingSlice<&str>) -> Result<String> {
@@ -33,9 +34,10 @@ where
 }
 
 pub fn parse_property(input: &mut LocatingSlice<&str>) -> Result<Property> {
-    let (key, value) =
-        separated_pair(parse_identifier, ws(':'), parse_string_value).parse_next(input)?;
-    Ok(Property { key, value })
+    let ((key, value), span) = separated_pair(parse_identifier, ws(':'), parse_string_value)
+        .with_span()
+        .parse_next(input)?;
+    Ok(Property { key, value, span })
 }
 
 #[cfg(test)]
