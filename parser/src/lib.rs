@@ -3,7 +3,7 @@ use winnow::{
     combinator::{delimited, separated_pair},
     error::ParserError,
     token::take_while,
-    Parser, Result,
+    LocatingSlice, Parser, Result,
 };
 
 #[derive(Clone, Debug, PartialEq)]
@@ -12,13 +12,13 @@ pub struct Property {
     pub value: String,
 }
 
-fn parse_identifier(input: &mut &str) -> Result<String> {
+fn parse_identifier(input: &mut LocatingSlice<&str>) -> Result<String> {
     let identifier =
         take_while(0.., |c: char| c.is_alphanumeric() || c == '-' || c == '_').parse_next(input)?;
     Ok(identifier.to_owned())
 }
 
-fn parse_string_value(input: &mut &str) -> Result<String> {
+fn parse_string_value(input: &mut LocatingSlice<&str>) -> Result<String> {
     let result = delimited('"', take_while(0.., |c: char| c != '"'), '"').parse_next(input)?;
     Ok(result.to_owned())
 }
@@ -32,7 +32,7 @@ where
     delimited(multispace0, inner, multispace0)
 }
 
-pub fn parse_property(input: &mut &str) -> Result<Property> {
+pub fn parse_property(input: &mut LocatingSlice<&str>) -> Result<Property> {
     let (key, value) =
         separated_pair(parse_identifier, ws(':'), parse_string_value).parse_next(input)?;
     Ok(Property { key, value })
